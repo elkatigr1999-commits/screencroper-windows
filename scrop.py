@@ -61,15 +61,17 @@ def get_special_folder(folder_id):
     ctypes.windll.shell32.SHGetFolderPathW(None, folder_id, None, 0, buf)
     return buf.value
 
-def create_shortcut(target_path, shortcut_path, working_dir):
+def create_shortcut(target_path, shortcut_path, working_dir, icon_location=None):
     try:
         ps_cmd = (
             f'$WshShell = New-Object -ComObject WScript.Shell; '
             f'$Shortcut = $WshShell.CreateShortcut("{shortcut_path}"); '
             f'$Shortcut.TargetPath = "{target_path}"; '
             f'$Shortcut.WorkingDirectory = "{working_dir}"; '
-            f'$Shortcut.Save()'
         )
+        if icon_location:
+            ps_cmd += f'$Shortcut.IconLocation = "{icon_location}"; '
+        ps_cmd += '$Shortcut.Save()'
         subprocess.run(
             ["powershell", "-Command", ps_cmd],
             shell=True,
@@ -691,8 +693,15 @@ def check_and_create_shortcuts():
         start_menu = get_special_folder(2)
         exe_path = sys.executable if getattr(sys, 'frozen', False) else os.path.abspath(sys.argv[0])
         working_dir = os.path.dirname(exe_path)
-        create_shortcut(exe_path, os.path.join(desktop, "ScreenCroper.lnk"), working_dir)
-        create_shortcut(exe_path, os.path.join(start_menu, "ScreenCroper.lnk"), working_dir)
+        
+        # Определяем путь к иконке для ярлыка
+        if getattr(sys, 'frozen', False):
+            icon_location = f"{exe_path},0"
+        else:
+            icon_location = os.path.join(working_dir, "logo.ico")
+            
+        create_shortcut(exe_path, os.path.join(desktop, "ScreenCroper.lnk"), working_dir, icon_location)
+        create_shortcut(exe_path, os.path.join(start_menu, "ScreenCroper.lnk"), working_dir, icon_location)
         messagebox.showinfo(t("done_title"), t("shortcuts_ok"), parent=root)
     user_config["first_run"] = False
     save_config(user_config)
