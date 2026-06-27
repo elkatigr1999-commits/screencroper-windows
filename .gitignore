@@ -1,0 +1,34 @@
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Временные папки PyInstaller (onefile режим)
+_MEI*/
+
+# Конфиг пользователя (содержит личные настройки разрешений)
+config.json
+
+# Логи и отладочные файлы
+err.txt
+*.log
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Виртуальные окружения
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Windows
+Thumbs.db
+desktop.ini
